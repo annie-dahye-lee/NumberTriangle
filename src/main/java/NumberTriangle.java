@@ -114,41 +114,37 @@ public class NumberTriangle {
      * @return the topmost NumberTriangle object in the NumberTriangle structure read from the specified file
      * @throws IOException may naturally occur if an issue reading the file occurs
      */
-    public static NumberTriangle loadTriangle(String fname) throws IOException {
-        // open the file and get a BufferedReader object whose methods
-        // are more convenient to work with when reading the file contents.
-        InputStream inputStream = NumberTriangle.class.getClassLoader().getResourceAsStream(fname);
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+public static NumberTriangle loadTriangle(String fname) throws IOException {
+    InputStream inputStream = NumberTriangle.class.getClassLoader().getResourceAsStream(fname);
+    BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
-        List<NumberTriangle> prevRow = new ArrayList<>(); // NumberTriangles from previous row
-        NumberTriangle top = null;
+    List<NumberTriangle> prevRow = new ArrayList<>();
+    NumberTriangle top = null;
 
+    String line = br.readLine();
+    while (line != null) {
+        String[] numbers = line.trim().split("\\s+");
+        List<NumberTriangle> currRow = new ArrayList<>(numbers.length);
 
-        String line = br.readLine();
-        while (line != null) {
-
-            String[] numbers = line.trim().split("\\s+"); // split the line into String list separated by any whitespace
-            List<NumberTriangle> currRow = new ArrayList<>(numbers.length); // storing all the numbers of this row in an ArrayList
-
-            for (String num : numbers) {
-                currRow.add(new NumberTriangle(Integer.parseInt(num)));
-            }
-
-            if (!prevRow.isEmpty()) { // not the first row
-                for (int i = 0; i < prevRow.size(); i++) {
-                    prevRow.get(i).setLeft(currRow.get(i)); // set current num on previous row as the left parent of the non-edge left num of current row
-                    prevRow.get(i).setRight(currRow.get(i + 1)); // set current num on previous row as right parent of the non-edge right num of current row
-                }
-            } else { // very first row
-                top = currRow.get(0); // set top root as the first number of first row
-            }
-
-            prevRow = currRow;
-            line = br.readLine(); // reads next line
+        for (String num : numbers) {
+            currRow.add(new NumberTriangle(Integer.parseInt(num)));
         }
-        br.close();
-        return top;
+
+        if (!prevRow.isEmpty()) {
+            for (int i = 0; i < prevRow.size(); i++) {
+                prevRow.get(i).setLeft(currRow.get(i));
+                prevRow.get(i).setRight(currRow.get(i + 1));
+            }
+        } else {
+            top = currRow.get(0);
+        }
+
+        prevRow = currRow;
+        line = br.readLine();
     }
+    br.close();
+    return top;
+}
 
     public static void main(String[] args) throws IOException {
 
