@@ -1,4 +1,6 @@
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is the provided NumberTriangle class to be used in this coding task.
@@ -109,26 +111,40 @@ public class NumberTriangle {
         InputStream inputStream = NumberTriangle.class.getClassLoader().getResourceAsStream(fname);
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
-
-        // TODO define any variables that you want to use to store things
+        List<NumberTriangle> prevRow = new ArrayList<>(); // NumberTriangles from previous row
+        NumberTriangle top = null;
 
         // will need to return the top of the NumberTriangle,
         // so might want a variable for that.
-        NumberTriangle top = null;
 
         String line = br.readLine();
         while (line != null) {
 
             // remove when done; this line is included so running starter code prints the contents of the file
-            System.out.println(line);
+            // System.out.println(line);
 
-            // TODO process the line
+            String[] numbers = line.trim().split("\\s+"); // split the line into String list separated by any whitespace
+            List<NumberTriangle> currRow = new ArrayList<>(numbers.length); // storing all the numbers of this row in an ArrayList
 
+            for (String num : numbers) {
+                currRow.add(new NumberTriangle(Integer.parseInt(num)));
+            }
+
+            if (!prevRow.isEmpty()) { // not the first row
+                for (int i = 0; i < prevRow.size(); i++) {
+                    prevRow.get(i).setLeft(currRow.get(i)); // set current num on previous row as the left parent of the non-edge left num of current row
+                    prevRow.get(i).setRight(currRow.get(i + 1)); // set current num on previous row as right parent of the non-edge right num of current row
+                }
+            } else { // it is the very first row
+                top = currRow.get(0); // set top root as the first number of first row
+            }
+
+            prevRow = currRow; // iterate through rows where the previous row is now the current row
             //read the next line
             line = br.readLine();
         }
         br.close();
-        return top;
+        return top; // return the top root of the number triangle
     }
 
     public static void main(String[] args) throws IOException {
@@ -138,7 +154,23 @@ public class NumberTriangle {
         // [not for credit]
         // you can implement NumberTriangle's maxPathSum method if you want to try to solve
         // Problem 18 from project Euler [not for credit]
-        mt.maxSumPath();
-        System.out.println(mt.getRoot());
+        //        mt.maxSumPath();
+        //        System.out.println(mt.getRoot());
+
+
+        // Root check
+        System.out.println("Root: " + mt.getRoot()); // should be 75
+
+        // First row of children
+        System.out.println("Left child of root: " + mt.left.getRoot());  // should be 95
+        System.out.println("Right child of root: " + mt.right.getRoot()); // should be 64
+
+        // Second row of children
+        System.out.println("Left child of 95: " + mt.left.left.getRoot());   // should be 17
+        System.out.println("Right child of 95: " + mt.left.right.getRoot()); // should be 47
+
+        System.out.println("Left child of 64: " + mt.right.left.getRoot());  // should be 47
+        System.out.println("Right child of 64: " + mt.right.right.getRoot()); // should be 82
+
     }
 }
